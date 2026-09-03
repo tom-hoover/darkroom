@@ -67,8 +67,8 @@ type Job struct {
 // decodePreference ranks extensions for the duplicate-basename rule. A lower
 // number wins.
 //
-// The same photograph commonly exists as both X.heic and X.jpg — heic2jpg
-// produces exactly that pairing — and both would otherwise map to one output
+// The same photograph commonly exists as both X.heic and X.jpg — any
+// HEIC-to-JPEG converter produces exactly that pairing — and both would otherwise map to one output
 // path, letting two workers race and one rendering overwrite the other. The
 // already-decoded JPEG is preferred because decoding HEIC is the expensive
 // path and the JPEG is derived from it.
@@ -106,7 +106,7 @@ func (c Command) Scan(root, outDir string, recursive bool) ([]Job, []string, err
 
 	// An output directory inside the scanned tree would otherwise feed its own
 	// contents back in on a later run, nesting one level deeper each time.
-	// This mirrors heic2jpg's Scan. Under -out the output is named <base>.jpg
+	// Under -out the output is named <base>.jpg
 	// with no suffix, so isOwnOutput cannot recognise it by name; the
 	// directory has to be skipped by path.
 	//

@@ -74,8 +74,10 @@ func TestIsSupported(t *testing.T) {
 // all the orientation tag that decides which way up a phone photo appears.
 // A JPEG source's only path to it is extractJPEGExif feeding WriteJPEG, and
 // the tests below are the only ones that exercise that wiring end to end.
-// testdata/sample.heic carries no EXIF, so nothing that reads it can cover
-// this.
+//
+// The HEIC path, through goheif.ExtractExif, has no end-to-end coverage in
+// this package: these tests synthesise an EXIF block rather than read a real
+// photograph, so nothing here would catch a regression on that side.
 
 // minimalExif builds a real EXIF block: the "Exif\0\0" identifier that a JPEG
 // APP1 segment carries, followed by a valid little-endian TIFF header holding

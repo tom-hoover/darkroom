@@ -283,9 +283,8 @@ func TestScanRefusesACommandWithNoSuffix(t *testing.T) {
 	}
 }
 
-// TestScanSkipsOutputDirectory mirrors heic2jpg's test of the same name;
-// Scan's own comment records that this directory-walk behaviour is
-// deliberately copied from heic2jpg's Scan. Without it, a second recursive
+// TestScanSkipsOutputDirectory guards the directory-walk rule that Scan's own
+// comment explains. Without it, a second recursive
 // run re-reads the first run's output — and because -out output carries no
 // suffix, isOwnOutput cannot recognise it by name — so the tree nests one
 // level deeper on every run.

@@ -70,12 +70,12 @@ func TestIsSupported(t *testing.T) {
 	}
 }
 
-// EXIF preservation is spec section 5 step 6 and success criterion 4: capture
-// date, GPS, and above all the orientation tag that decides which way up a
-// phone photo appears. skyburn's only path to it for a JPEG source is
-// extractJPEGExif feeding WriteJPEG, and the tests below are the only ones
-// that exercise that wiring end to end. testdata/sample.heic carries no EXIF,
-// so nothing that reads it can cover this.
+// EXIF preservation matters because it carries capture date, GPS, and above
+// all the orientation tag that decides which way up a phone photo appears.
+// A JPEG source's only path to it is extractJPEGExif feeding WriteJPEG, and
+// the tests below are the only ones that exercise that wiring end to end.
+// testdata/sample.heic carries no EXIF, so nothing that reads it can cover
+// this.
 
 // minimalExif builds a real EXIF block: the "Exif\0\0" identifier that a JPEG
 // APP1 segment carries, followed by a valid little-endian TIFF header holding

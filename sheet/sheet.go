@@ -3,9 +3,12 @@
 // It is renderer-agnostic — the caller supplies the tile renderer — so the
 // same geometry and label-fit logic can serve more than one rendering
 // pipeline without being re-derived per pipeline. That sharing is deliberate:
-// tasks/lessons .md records that this sheet's label-fit assertion was one of
-// five tests that guarded nothing, so re-deriving this geometry in a second
-// package is a known hazard.
+// label-fit is easy to get wrong in a way that only shows up as clipped or
+// overlapping text, which a test that recomputes the implementation's own
+// arithmetic instead of reading the rendered pixels will not catch — see
+// TestContactSheetLabelsFitTheirCells, in sheet_test.go, for exactly that
+// failure mode and how this package guards against it. Re-deriving this
+// geometry in a second package means re-deriving that guard too.
 package sheet
 
 import (
@@ -42,13 +45,15 @@ func thumbnailFor(img image.Image, px int) image.Image {
 // The source is thumbnailed once, up front, and each tile is that thumbnail
 // put through render, rather than rendered at full size and shrunk
 // afterwards. This is a cost decision, not a correctness one: it relies on
-// render being scale-invariant. Every caller must pin that property for its
-// own renderer, and both do: internal/bw's
-// TestContactSheetRendersAtThumbnailScale and internal/ciba's test of the
-// same name. Given scale invariance, the two orders produce nearly identical
-// output, so the cost is the only real difference: one full-resolution render
-// per name instead of one shared thumbnail, roughly ninety times the work for
-// ten names on a 12MP photograph.
+// render being scale-invariant, i.e. built on primitives like tone.RadiusPx
+// that take their spatial parameters as a fraction of the image rather than
+// a pixel count. Every caller must pin that property with a test against its
+// own renderer — this package cannot verify it on their behalf, since it
+// only knows render as an opaque function. Given scale invariance, the two
+// orders produce nearly identical output, so the cost is the only real
+// difference: one full-resolution render per name instead of one shared
+// thumbnail, roughly ninety times the work for ten names on a 12MP
+// photograph.
 //
 // render is called with the tile's own index, and names[i] labels the tile
 // render(thumb, i) produced. Nothing in the layout depends on tile content,

@@ -2,10 +2,15 @@
 //
 // RadiusPx is the reason this package exists rather than a copy in each
 // pipeline. It carries the scale-invariance contract that makes a small
-// contact-sheet tile predict a full-resolution render, and tasks/lessons .md
-// records that re-deriving that single line silently broke resolution
-// independence at 4096px — a defect a whole-image difference test could not
-// detect above a certain size. One definition, one place to get it wrong.
+// contact-sheet tile predict a full-resolution render: a spatial parameter
+// expressed as a fraction of the image's short edge, not a pixel count, so
+// the same setting produces the same picture at any resolution. Re-deriving
+// that single line in more than one place risks resolution independence
+// breaking silently at large sizes — a defect a whole-image difference test
+// cannot catch, because the discrepancy it produces is too small a fraction
+// of the image to trip a typical tolerance. One definition, one place to get
+// it wrong; TestRadiusPxIsProportionalAtEveryScale, in tone_test.go, is what
+// pins the contract at its source.
 package tone
 
 import "math"

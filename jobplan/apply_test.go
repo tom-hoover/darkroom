@@ -48,9 +48,10 @@ func grey(src image.Image) image.Image {
 // TestRenderFileProducesGreyJPEG pins RenderFile's own plumbing: what the
 // renderer returns is exactly what lands in the file, decodable and at the
 // source's dimensions. The colour science — which style does what to which
-// pixel — belongs to internal/bw and internal/ciba and is covered there; at
-// this layer a renderer that ignores its input is the honest fixture, so the
-// assertion is on fidelity to grey's flat 128 rather than on a tone curve.
+// pixel — is each caller's own Renderer's business and is covered by that
+// caller's tests, not this package's; at this layer a renderer that ignores
+// its input is the honest fixture, so the assertion is on fidelity to grey's
+// flat 128 rather than on a tone curve.
 func TestRenderFileProducesGreyJPEG(t *testing.T) {
 	dir := t.TempDir()
 	src := filepath.Join(dir, "sky.jpg")
@@ -215,10 +216,10 @@ func TestRenderFileWritesThroughASymlinkElsewhere(t *testing.T) {
 }
 
 // writeJPEGWithExif writes a JPEG to path carrying a real EXIF block, adapted
-// from internal/imaging/decode_test.go's TestExifSurvivesDecodeThenWriteJPEG
+// from the imaging package's own TestExifSurvivesDecodeThenWriteJPEG
 // (jpegWithSegments + minimalExif) so this package can build a fixture that
 // exercises the same metadata path RenderFile actually uses, without
-// depending on internal/imaging's unexported test helpers.
+// depending on imaging's unexported test helpers.
 func writeJPEGWithExif(t *testing.T, path string) {
 	t.Helper()
 	img := image.NewRGBA(image.Rect(0, 0, 16, 12))
@@ -264,8 +265,9 @@ func writeJPEGWithExif(t *testing.T, path string) {
 }
 
 // TestExifSurvivesRenderFile covers the whole path — decode, render, encode —
-// rather than the encoder alone. EXIF preservation shipped on the skyburn
-// branch with no end-to-end test and a whole-branch review had to find it.
+// rather than the encoder alone. A unit test on the encoder in isolation
+// would miss a break anywhere earlier in the chain, such as the decoder
+// failing to hand the encoder metadata to carry through in the first place.
 func TestExifSurvivesRenderFile(t *testing.T) {
 	dir := t.TempDir()
 	src := filepath.Join(dir, "in.jpg")
